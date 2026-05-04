@@ -1,0 +1,19 @@
+{
+  "profile": {
+    "name": "Broken Example",
+    "tagline": "Intentionally rough edges for validation coverage.",
+    "website": "http://example.dev",
+    "focus": ["Trigger warnings intentionally"],
+    "links": [
+      { "label": "Missing asset", "url": "./assets/missing.png" }
+    ],
+    "projects": [
+      {
+        "name": "Shaky demo",
+        "description": "A project with a non-HTTPS repo link.",
+        "repo": "http://example.dev/repo",
+        "status": "experimental"
+      }
+    ]
+  }
+}
