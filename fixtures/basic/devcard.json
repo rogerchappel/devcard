@@ -1,0 +1,47 @@
+{
+  "profile": {
+    "name": "Forge Example",
+    "tagline": "Building local-first tools that stay understandable on a sleepy Tuesday.",
+    "location": "Brisbane, Australia",
+    "pronouns": "they/them",
+    "website": "https://example.dev",
+    "email": "forge@example.dev",
+    "focus": [
+      "Ship calm, documented CLI tools",
+      "Keep maintenance obvious for future-you"
+    ],
+    "now": [
+      "Making README generators less cursed",
+      "Writing tests before pretending the CLI is done"
+    ],
+    "stack": ["TypeScript", "Node.js", "Markdown", "JSON fixtures"],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/example" },
+      { "label": "Mastodon", "url": "https://fosstodon.org/@example" }
+    ],
+    "projects": [
+      {
+        "name": "devcard",
+        "description": "A generator for profile READMEs with explicit validation and upkeep hints.",
+        "repo": "https://github.com/rogerchappel/devcard",
+        "status": "active",
+        "highlights": [
+          "Reads local config only",
+          "Separates rendering from validation",
+          "Generates an update checklist"
+        ]
+      }
+    ],
+    "writing": [
+      { "label": "Shipping calm tooling", "url": "https://example.dev/posts/calm-tooling" }
+    ],
+    "notes": [
+      "Generated locally from fixture data.",
+      "Validation is explicit and intentionally boring."
+    ]
+  },
+  "options": {
+    "includeChecklist": true,
+    "includeValidationSummary": true
+  }
+}
