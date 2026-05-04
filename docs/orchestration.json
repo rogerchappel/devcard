@@ -1,0 +1,20 @@
+{
+  "project": "devcard",
+  "factoryRun": "2026-05-05T06:30:00+10:00",
+  "owner": "isolated-sub-agent",
+  "objective": "ship-local-first-mvp",
+  "workstreams": [
+    "scope-docs",
+    "typescript-library",
+    "cli-and-smoke",
+    "fixtures-and-examples",
+    "publish-and-protect"
+  ],
+  "guardrails": {
+    "repoOnly": true,
+    "localFirst": true,
+    "noSecrets": true,
+    "noHiddenTelemetry": true,
+    "preserveAttribution": true
+  }
+}
