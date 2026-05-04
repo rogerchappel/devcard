@@ -1,0 +1,35 @@
+{
+  "profile": {
+    "name": "Your Name",
+    "tagline": "A crisp sentence about what you build and why it matters.",
+    "location": "City, Country",
+    "website": "https://your-site.example",
+    "focus": [
+      "One thing you are actively focused on",
+      "Another thing you want readers to notice"
+    ],
+    "now": [
+      "What you are shipping this month"
+    ],
+    "stack": ["TypeScript", "Node.js"],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/yourname" }
+    ],
+    "projects": [
+      {
+        "name": "Project name",
+        "description": "Why this project matters.",
+        "repo": "https://github.com/yourname/project",
+        "status": "active",
+        "highlights": ["A proof point", "Another proof point"]
+      }
+    ],
+    "notes": [
+      "Keep this honest and maintainable."
+    ]
+  },
+  "options": {
+    "includeChecklist": true,
+    "includeValidationSummary": true
+  }
+}
