@@ -1,4 +1,4 @@
-# /Users/roger/Developer/my-opensource/devcard Documentation
+# DevCard Documentation
 
 This directory holds project documentation.
 
@@ -6,6 +6,7 @@ This directory holds project documentation.
 
 - [Contributing guide](../CONTRIBUTING.md)
 - [Security policy](../SECURITY.md)
+- [Release candidate checklist](release-candidate.md)
 - [Agent instructions](../AGENTS.md)
 
 ## Additional docs
