@@ -12,6 +12,8 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 - Explicit validation modes for links and local assets.
 - Fixture-backed tests and CLI smoke coverage.
 - Project docs, examples, and contribution/security guidance.
+- npm package allowlist now includes docs and support files needed to evaluate a
+  release-candidate install.
 
 ## Release links
 

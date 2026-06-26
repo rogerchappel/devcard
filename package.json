@@ -17,6 +17,7 @@
     "bin",
     "dist",
     "examples",
+    "docs",
     "README.md",
     "LICENSE",
     "SECURITY.md",
