@@ -72,6 +72,14 @@ This tool **does not** fetch remote URLs, scrape services, publish anything, or 
 
 See `examples/devcard.json` and `fixtures/basic/devcard.json` for fuller examples.
 
+For a fixture-backed walkthrough that generates a disposable profile README,
+see [docs/tutorials/profile-readme-refresh.md](docs/tutorials/profile-readme-refresh.md)
+or run:
+
+```sh
+bash demo/run-profile-readme-demo.sh
+```
+
 ## Output sections
 
 `devcard` currently renders:
@@ -108,6 +116,9 @@ await generateFromConfig('./devcard.json', './README.generated.md', {
 - Validation is intentionally conservative and explicit.
 
 If you want remote link checking later, make it opt-in and obvious.
+
+Promotion-safe copy and video angles are drafted in
+[docs/promo/social-hooks.md](docs/promo/social-hooks.md).
 
 ## Development
 
