@@ -127,6 +127,7 @@ Promotion-safe copy and video angles are drafted in
 
 ```sh
 npm install
+npm run audit:dependencies
 npm test
 npm run check
 npm run build
