@@ -32,7 +32,8 @@
     "test": "node --test --import tsx",
     "smoke": "node scripts/smoke.mjs",
     "package:smoke": "node scripts/package-smoke.mjs",
-    "release:check": "npm run check && npm test && npm run build && npm run smoke && npm run package:smoke",
+    "audit:dependencies": "npm audit --audit-level=low",
+    "release:check": "npm run audit:dependencies && npm run check && npm test && npm run build && npm run smoke && npm run package:smoke",
     "lint": "npm run check"
   },
   "keywords": [
