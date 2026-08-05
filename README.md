@@ -21,8 +21,11 @@ Profile READMEs rot fast. They start sincere, then quietly become a museum of la
 ## Install
 
 ```sh
-npm install devcard
+npm install --global devcard
 ```
+
+You can also install it as a project dependency with `npm install devcard` when
+using the library API.
 
 Or run locally in this repo:
 
@@ -132,6 +135,18 @@ npm run package:smoke
 npm run release:check
 bash scripts/validate.sh
 ```
+
+## Releases
+
+Pushing a semantic-version tag such as `v0.2.0` runs the full
+`npm run release:check`, publishes the resulting package to npm with provenance,
+and attaches the same tarball to a GitHub release. The tag version must match
+the version in `package.json`.
+
+Publishing uses npm trusted publishing rather than a long-lived npm token. The
+npm package must configure this GitHub repository and the
+`.github/workflows/release.yml` workflow as a trusted publisher. The GitHub
+Actions environment needs `id-token: write`; no `NPM_TOKEN` secret is required.
 
 ## Contributing
 
