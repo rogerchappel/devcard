@@ -1,5 +1,8 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const output = execFileSync('npm', ['pack', '--dry-run', '--json'], {
   encoding: 'utf8',
@@ -42,3 +45,49 @@ if (missingBins.length > 0) {
 }
 
 console.log(`package smoke ok: ${pack.filename} includes ${pack.files.length} files`);
+
+const installDirectory = mkdtempSync(join(tmpdir(), 'devcard-package-smoke-'));
+let packedPath;
+
+try {
+  const packedFilename = execFileSync('npm', ['pack', '--silent'], {
+    encoding: 'utf8',
+  }).trim();
+  packedPath = resolve(packedFilename);
+
+  execFileSync(
+    'npm',
+    ['install', '--ignore-scripts', '--no-audit', '--no-fund', packedPath],
+    { cwd: installDirectory, stdio: 'inherit' },
+  );
+
+  const outputPath = join(installDirectory, 'README.generated.md');
+  execFileSync(
+    join(installDirectory, 'node_modules', '.bin', 'devcard'),
+    [
+      'generate',
+      '--config',
+      resolve('fixtures/basic/devcard.json'),
+      '--output',
+      outputPath,
+      '--validate',
+      'safe',
+    ],
+    { stdio: 'inherit' },
+  );
+
+  if (!readFileSync(outputPath, 'utf8').includes('# Forge Example')) {
+    throw new Error('Installed devcard binary did not generate the expected fixture output');
+  }
+
+  const installedEntry = join(installDirectory, 'node_modules', 'devcard', 'dist', 'index.js');
+  const { generateFromConfig } = await import(pathToFileURL(installedEntry));
+  if (typeof generateFromConfig !== 'function') {
+    throw new Error('Installed package does not export generateFromConfig');
+  }
+
+  console.log('package install smoke ok: installed CLI and generateFromConfig API work');
+} finally {
+  if (packedPath) rmSync(packedPath, { force: true });
+  rmSync(installDirectory, { recursive: true, force: true });
+}
