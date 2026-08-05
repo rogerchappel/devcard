@@ -14,6 +14,13 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 - Project docs, examples, and contribution/security guidance.
 - npm package allowlist now includes docs and support files needed to evaluate a
   release-candidate install.
+- Package smoke coverage now installs the packed tarball and exercises both the
+  installed CLI and the documented library API.
+
+### Changed
+
+- Tagged releases now publish the verified package to npm with provenance before
+  retaining the tarball in the GitHub release.
 
 ## Release links
 
