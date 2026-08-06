@@ -20,20 +20,18 @@ Profile READMEs rot fast. They start sincere, then quietly become a museum of la
 
 ## Install
 
-```sh
-npm install --global devcard
-```
-
-You can also install it as a project dependency with `npm install devcard` when
-using the library API.
-
-Or run locally in this repo:
+`devcard` is not yet available from the npm registry. Until `v0.1.1` is
+published, install and run it from a source checkout:
 
 ```sh
-npm install
+npm ci
 npm run build
 node dist/cli.js generate --config fixtures/basic/devcard.json --output ./README.generated.md
 ```
+
+After `v0.1.1` is published, install the CLI with
+`npm install --global devcard`, or add `devcard` as a project dependency when
+using the library API.
 
 ## Quickstart
 
@@ -148,6 +146,16 @@ Publishing uses npm trusted publishing rather than a long-lived npm token. The
 npm package must configure this GitHub repository and the
 `.github/workflows/release.yml` workflow as a trusted publisher. The GitHub
 Actions environment needs `id-token: write`; no `NPM_TOKEN` secret is required.
+
+For the next release, merge the release-readiness change and tag the resulting
+commit as `v0.1.1`. After the workflow succeeds, verify the registry before
+announcing the release:
+
+```sh
+npm view devcard@0.1.1 version
+```
+
+The command must return `0.1.1`.
 
 ## Contributing
 

@@ -6,6 +6,8 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-08-06
+
 ### Added
 
 - Local-first TypeScript CLI and library for generating developer profile READMEs.
@@ -24,5 +26,6 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 ## Release links
 
-- Unreleased: <https://github.com/rogerchappel/devcard/compare/...HEAD>
+- Unreleased: <https://github.com/rogerchappel/devcard/compare/v0.1.1...HEAD>
+- 0.1.1: <https://github.com/rogerchappel/devcard/compare/v0.1.0...v0.1.1>
 - Latest release: <https://github.com/rogerchappel/devcard/releases/latest>

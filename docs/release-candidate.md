@@ -1,20 +1,22 @@
 # Release candidate readiness
 
-Generated: 2026-05-06 07:28:40 AEST
-Base branch: main
-Readiness branch: release-candidate/readiness
-Base commit: eb81600
+Target version: 0.1.1
 
 ## Local verification
 
-- npm ci: PASS
-- npm run release:check: PASS
-- bash scripts/validate.sh: PASS
-- releasebox check: PASS
+- [ ] `npm ci`
+- [ ] `npm run release:check`
+- [ ] `bash scripts/validate.sh`
+- [ ] ReleaseBox readiness check in the release workflow
 
 ## ReleaseBox notes
 
-The branch records the local release-readiness gate results requested for this release candidate pass. Dependencies were installed inside the isolated worktree before rerunning the readiness gates. Full command output was reviewed locally; this document keeps a durable summary in the repository for PR review.
+The release workflow publishes the verified package to npm with provenance and
+attaches the same tarball to the GitHub release. `releasebox.config.json` must
+therefore keep both npm publishing and GitHub release creation enabled.
+
+After the `v0.1.1` tag workflow succeeds, run
+`npm view devcard@0.1.1 version` and confirm that it returns `0.1.1`.
 
 ## Reviewer checklist
 
