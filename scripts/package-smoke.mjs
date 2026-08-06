@@ -11,6 +11,23 @@ const output = execFileSync('npm', ['pack', '--dry-run', '--json'], {
 const [pack] = JSON.parse(output);
 const packedFiles = new Set(pack.files.map((file) => file.path));
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+const packageLock = JSON.parse(readFileSync('package-lock.json', 'utf8'));
+const releaseboxConfig = JSON.parse(readFileSync('releasebox.config.json', 'utf8'));
+
+const metadataErrors = [];
+if (pack.name !== packageJson.name) metadataErrors.push('packed package name differs from package.json');
+if (pack.version !== packageJson.version) metadataErrors.push('packed version differs from package.json');
+if (packageLock.version !== packageJson.version) metadataErrors.push('package-lock version differs from package.json');
+if (packageLock.packages?.['']?.version !== packageJson.version) {
+  metadataErrors.push('package-lock root package version differs from package.json');
+}
+if (releaseboxConfig.release?.publishNpm !== true) {
+  metadataErrors.push('ReleaseBox is not configured to publish to npm');
+}
+if (metadataErrors.length > 0) {
+  console.error(`Package smoke failed; invalid publish metadata:\n${metadataErrors.join('\n')}`);
+  process.exit(1);
+}
 
 const requiredFiles = [
   'package.json',
