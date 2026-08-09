@@ -21,6 +21,15 @@ function optionalStringArray(value, label) {
     }
     return value.map((item, index) => assertString(item, `${label}[${index}]`));
 }
+function optionalBoolean(value, label, defaultValue) {
+    if (value === undefined) {
+        return defaultValue;
+    }
+    if (typeof value !== 'boolean') {
+        throw new Error(`Expected ${label} to be a boolean.`);
+    }
+    return value;
+}
 function parseProjects(value) {
     if (value == null) {
         return undefined;
@@ -117,10 +126,14 @@ export async function loadConfig(configPath, cwd = process.cwd()) {
     const config = {
         profile: parseProfile(parsed.profile),
     };
-    if (parsed.options && typeof parsed.options === 'object') {
+    if (parsed.options != null) {
+        if (typeof parsed.options !== 'object' || Array.isArray(parsed.options)) {
+            throw new Error('Expected options to be an object.');
+        }
+        const options = parsed.options;
         config.options = {
-            includeChecklist: Boolean(parsed.options.includeChecklist ?? true),
-            includeValidationSummary: Boolean(parsed.options.includeValidationSummary ?? true),
+            includeChecklist: optionalBoolean(options.includeChecklist, 'options.includeChecklist', true),
+            includeValidationSummary: optionalBoolean(options.includeValidationSummary, 'options.includeValidationSummary', true),
         };
     }
     return config;
