@@ -3,9 +3,6 @@ export function printHelp() {
     return `devcard\n\nUsage:\n  devcard generate --config ./devcard.json --output ./README.generated.md [--validate safe|none]\n\nNotes:\n  - Local-first: reads JSON config from disk and writes Markdown locally.\n  - Explicit validation only: safe mode checks local file existence and warns on non-HTTPS links.\n  - No hidden network calls or publishing.\n`;
 }
 export function parseArgs(argv, cwd = process.cwd()) {
-    if (argv.includes('--help') || argv.length === 0) {
-        throw new Error(printHelp());
-    }
     if (argv[0] !== 'generate') {
         throw new Error(`Unknown command: ${argv[0]}\n\n${printHelp()}`);
     }
@@ -38,19 +35,23 @@ export function parseArgs(argv, cwd = process.cwd()) {
         cwd,
     };
 }
-export async function runCli(argv, cwd = process.cwd()) {
+export async function runCli(argv, cwd = process.cwd(), io = { stdout: process.stdout, stderr: process.stderr }) {
+    if (argv.length === 0 || argv.includes('--help')) {
+        io.stdout.write(printHelp());
+        return 0;
+    }
     try {
         const options = parseArgs(argv, cwd);
         const result = await generateFromConfig(options.config, options.output, {
             cwd,
             validationMode: options.validationMode,
         });
-        process.stdout.write(`Generated ${options.output}\n`);
-        process.stdout.write(`Validation findings: ${result.validation.findings.length}\n`);
+        io.stdout.write(`Generated ${options.output}\n`);
+        io.stdout.write(`Validation findings: ${result.validation.findings.length}\n`);
         return result.validation.findings.some((finding) => finding.level === 'error') ? 2 : 0;
     }
     catch (error) {
-        process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+        io.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
         return 1;
     }
 }
