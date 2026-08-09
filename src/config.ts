@@ -26,6 +26,16 @@ function optionalStringArray(value: unknown, label: string): string[] | undefine
   return value.map((item, index) => assertString(item, `${label}[${index}]`));
 }
 
+function optionalBoolean(value: unknown, label: string, defaultValue: boolean): boolean {
+  if (value === undefined) {
+    return defaultValue;
+  }
+  if (typeof value !== 'boolean') {
+    throw new Error(`Expected ${label} to be a boolean.`);
+  }
+  return value;
+}
+
 function parseProjects(value: unknown): DevcardProject[] | undefined {
   if (value == null) {
     return undefined;
@@ -136,10 +146,14 @@ export async function loadConfig(configPath: string, cwd = process.cwd()): Promi
     profile: parseProfile(parsed.profile),
   };
 
-  if (parsed.options && typeof parsed.options === 'object') {
+  if (parsed.options != null) {
+    if (typeof parsed.options !== 'object' || Array.isArray(parsed.options)) {
+      throw new Error('Expected options to be an object.');
+    }
+    const options = parsed.options as Record<string, unknown>;
     config.options = {
-      includeChecklist: Boolean((parsed.options as Record<string, unknown>).includeChecklist ?? true),
-      includeValidationSummary: Boolean((parsed.options as Record<string, unknown>).includeValidationSummary ?? true),
+      includeChecklist: optionalBoolean(options.includeChecklist, 'options.includeChecklist', true),
+      includeValidationSummary: optionalBoolean(options.includeValidationSummary, 'options.includeValidationSummary', true),
     };
   }
 
