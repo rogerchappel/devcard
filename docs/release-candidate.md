@@ -6,6 +6,7 @@ Target version: 0.1.1
 
 - [ ] `npm ci`
 - [ ] `npm run release:check`
+- [ ] Confirm the intended tag is exactly `v<package.json version>`.
 - [ ] `bash scripts/validate.sh`
 - [ ] ReleaseBox readiness check in the release workflow
 
@@ -14,6 +15,11 @@ Target version: 0.1.1
 The release workflow publishes the verified package to npm with provenance and
 attaches the same tarball to the GitHub release. `releasebox.config.json` must
 therefore keep both npm publishing and GitHub release creation enabled.
+
+Before `npm pack`, `npm run release:preflight` fails on a mismatched tag,
+inconsistent package-lock root versions, an unavailable npm registry, or an
+already-published `name@version`. Local `release:check` validates metadata and
+workflow ordering without contacting npm.
 
 After the `v0.1.1` tag workflow succeeds, run
 `npm view devcard@0.1.1 version` and confirm that it returns `0.1.1`.
