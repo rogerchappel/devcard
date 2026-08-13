@@ -140,7 +140,10 @@ bash scripts/validate.sh
 Pushing a semantic-version tag such as `v0.2.0` runs the full
 `npm run release:check`, publishes the resulting package to npm with provenance,
 and attaches the same tarball to a GitHub release. The tag version must match
-the version in `package.json`.
+the version in `package.json`. The local check also verifies both root versions
+in `package-lock.json` and the workflow ordering. On a tagged run,
+`npm run release:preflight` fails before packing if the tag is not exactly
+`v<package.json version>`, npm is unavailable, or the version already exists.
 
 Publishing uses npm trusted publishing rather than a long-lived npm token. The
 npm package must configure this GitHub repository and the
