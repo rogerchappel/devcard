@@ -45,7 +45,7 @@ devcard generate --config ./devcard.json --output ./README.md --validate safe
 
 ### Validation modes
 
-- `safe` — validates local file references and warns on non-HTTPS links.
+- `safe` — validates website, writing, project, and email targets; checks local paths used by custom links; and warns on HTTP links.
 - `none` — skip validation entirely.
 
 This tool **does not** fetch remote URLs, scrape services, publish anything, or phone home.
