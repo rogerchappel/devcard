@@ -48,6 +48,10 @@ devcard generate --config ./devcard.json --output ./README.md --validate safe
 - `safe` — validates website, writing, project, and email targets; checks local paths used by custom links; and warns on HTTP links.
 - `none` — skip validation entirely.
 
+Relative local link paths are resolved from the directory containing the config
+file, regardless of the directory where `devcard` is invoked. Library callers
+can override that rule with `validationBase` (resolved from `cwd`).
+
 This tool **does not** fetch remote URLs, scrape services, publish anything, or phone home.
 
 ## Config shape
@@ -105,6 +109,7 @@ import { generateFromConfig } from 'devcard';
 
 await generateFromConfig('./devcard.json', './README.generated.md', {
   validationMode: 'safe',
+  // validationBase: './assets-root', // optional; defaults to the config directory
 });
 ```
 
