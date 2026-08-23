@@ -1,5 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtemp, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { parseArgs, runCli } from '../src/cli.js';
 
 test('parseArgs resolves generate command options', () => {
@@ -38,3 +41,43 @@ for (const argv of [['unknown'], ['generate', '--validate', 'invalid'], ['genera
     assert.match(capture.output().stderr, /(?:Unknown command|Unsupported argument):/);
   });
 }
+
+test('runCli resolves local links from the nested config directory', async (t) => {
+  const cwd = await mkdtemp(join(tmpdir(), 'devcard-cli-'));
+  t.after(async () => { await import('node:fs/promises').then(({ rm }) => rm(cwd, { recursive: true, force: true })); });
+  await mkdir(join(cwd, 'config', 'assets'), { recursive: true });
+  await writeFile(join(cwd, 'config', 'assets', 'avatar.txt'), 'avatar\n');
+  await writeFile(join(cwd, 'config', 'devcard.json'), JSON.stringify({
+    profile: {
+      name: 'Example',
+      tagline: 'A sufficiently descriptive tagline',
+      location: 'Brisbane',
+      website: 'https://example.com',
+      links: [{ label: 'Avatar', url: './assets/avatar.txt' }],
+    },
+  }));
+
+  const capture = captureIo();
+  assert.equal(await runCli(['generate', '--config', './config/devcard.json', '--output', './result/README.md'], cwd, capture.io), 0);
+  assert.match(capture.output().stdout, /Validation findings: 0/);
+  assert.match(await readFile(join(cwd, 'result', 'README.md'), 'utf8'), /\.\/assets\/avatar\.txt/);
+});
+
+test('runCli reports a missing link relative to the nested config directory', async (t) => {
+  const cwd = await mkdtemp(join(tmpdir(), 'devcard-cli-missing-'));
+  t.after(async () => { await import('node:fs/promises').then(({ rm }) => rm(cwd, { recursive: true, force: true })); });
+  await mkdir(join(cwd, 'config'), { recursive: true });
+  await writeFile(join(cwd, 'config', 'devcard.json'), JSON.stringify({
+    profile: {
+      name: 'Example',
+      tagline: 'A sufficiently descriptive tagline',
+      location: 'Brisbane',
+      website: 'https://example.com',
+      links: [{ label: 'Missing', url: './assets/missing.txt' }],
+    },
+  }));
+
+  const capture = captureIo();
+  assert.equal(await runCli(['generate', '--config', './config/devcard.json', '--output', './README.md'], cwd, capture.io), 2);
+  assert.match(capture.output().stdout, /Validation findings: 1/);
+});
