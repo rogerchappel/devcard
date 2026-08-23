@@ -38,9 +38,8 @@ function validateEmail(email: string, findings: ValidationFinding[]): void {
   }
 }
 
-async function validateLocalTarget(target: string, cwd: string, findings: ValidationFinding[]): Promise<void> {
-
-  const resolved = resolve(cwd, target);
+async function validateLocalTarget(target: string, baseDir: string, findings: ValidationFinding[]): Promise<void> {
+  const resolved = resolve(baseDir, target);
   try {
     await access(resolved);
     const stats = await stat(resolved);
@@ -52,7 +51,7 @@ async function validateLocalTarget(target: string, cwd: string, findings: Valida
   }
 }
 
-export async function validateConfig(config: DevcardConfig, cwd: string, mode: 'none' | 'safe'): Promise<ValidationReport> {
+export async function validateConfig(config: DevcardConfig, baseDir: string, mode: 'none' | 'safe'): Promise<ValidationReport> {
   const findings: ValidationFinding[] = [];
   const { profile } = config;
 
@@ -67,7 +66,7 @@ export async function validateConfig(config: DevcardConfig, cwd: string, mode: '
   if (profile.email) validateEmail(profile.email, findings);
   for (const link of profile.links ?? []) {
     if (/^[a-z][a-z\d+.-]*:/i.test(link.url)) validateWebTarget(link.url, 'link', findings);
-    else await validateLocalTarget(link.url, cwd, findings);
+    else await validateLocalTarget(link.url, baseDir, findings);
   }
   for (const item of profile.writing ?? []) {
     validateWebTarget(item.url, 'writing', findings);

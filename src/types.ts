@@ -68,5 +68,6 @@ export interface RenderResult {
 
 export interface GenerateOptions {
   cwd?: string;
+  validationBase?: string;
   validationMode?: LinkValidationMode;
 }
