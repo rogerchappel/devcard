@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { access, mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { generateFromConfig } from '../src/generate.js';
@@ -27,4 +27,17 @@ test('generateFromConfig accepts an explicit local-link validation base', async 
   });
 
   assert.deepEqual(result.validation.findings, []);
+});
+
+test('generateFromConfig rejects unknown keys before writing output', async () => {
+  const cwd = await mkdtemp(join(tmpdir(), 'devcard-generate-test-'));
+  await writeFile(join(cwd, 'devcard.json'), JSON.stringify({
+    profile: { name: 'Test User', tagline: 'Test profile', foucs: ['typo'] },
+  }));
+
+  await assert.rejects(
+    generateFromConfig('./devcard.json', './README.md', { cwd }),
+    /Unknown config key: profile\.foucs\./,
+  );
+  await assert.rejects(access(join(cwd, 'README.md')));
 });
