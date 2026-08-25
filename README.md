@@ -26,7 +26,7 @@ published, install and run it from a source checkout:
 ```sh
 npm ci
 npm run build
-node dist/cli.js generate --config fixtures/basic/devcard.json --output ./README.generated.md
+node bin/devcard.js generate --config fixtures/basic/devcard.json --output ./README.generated.md
 ```
 
 After `v0.1.1` is published, install the CLI with
@@ -76,6 +76,11 @@ This tool **does not** fetch remote URLs, scrape services, publish anything, or 
 ```
 
 See `examples/devcard.json` and `fixtures/basic/devcard.json` for fuller examples.
+Config keys are strict at every level. Unknown root, profile, project, link,
+writing, or options keys cause generation to stop before the output file is
+written, and the error identifies the full path (for example,
+`profile.projects[0].reop`). This prevents misspelled settings from being
+silently ignored; use the example files as the supported-key reference.
 
 For a fixture-backed walkthrough that generates a disposable profile README,
 see [docs/tutorials/profile-readme-refresh.md](docs/tutorials/profile-readme-refresh.md)
