@@ -32,8 +32,8 @@ function validateEmail(email, findings) {
         findings.push({ level: 'error', kind: 'link', message: 'Invalid profile email. Use an address such as name@example.com (mailto: is optional).', target: email });
     }
 }
-async function validateLocalTarget(target, cwd, findings) {
-    const resolved = resolve(cwd, target);
+async function validateLocalTarget(target, baseDir, findings) {
+    const resolved = resolve(baseDir, target);
     try {
         await access(resolved);
         const stats = await stat(resolved);
@@ -45,7 +45,7 @@ async function validateLocalTarget(target, cwd, findings) {
         findings.push({ level: 'error', kind: 'image', message: 'Local asset path does not exist.', target });
     }
 }
-export async function validateConfig(config, cwd, mode) {
+export async function validateConfig(config, baseDir, mode) {
     const findings = [];
     const { profile } = config;
     pushIfMissing(findings, profile.website, 'Profile website is optional, but recommended for a public card.');
@@ -61,7 +61,7 @@ export async function validateConfig(config, cwd, mode) {
         if (/^[a-z][a-z\d+.-]*:/i.test(link.url))
             validateWebTarget(link.url, 'link', findings);
         else
-            await validateLocalTarget(link.url, cwd, findings);
+            await validateLocalTarget(link.url, baseDir, findings);
     }
     for (const item of profile.writing ?? []) {
         validateWebTarget(item.url, 'writing', findings);

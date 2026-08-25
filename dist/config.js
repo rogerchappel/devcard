@@ -1,5 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+function assertKnownKeys(value, allowed, path = '') {
+    const allowedKeys = new Set(allowed);
+    const unknownKey = Object.keys(value).find((key) => !allowedKeys.has(key));
+    if (unknownKey) {
+        throw new Error(`Unknown config key: ${path}${unknownKey}.`);
+    }
+}
 function assertString(value, label) {
     if (typeof value !== 'string' || value.trim().length === 0) {
         throw new Error(`Expected ${label} to be a non-empty string.`);
@@ -42,6 +49,7 @@ function parseProjects(value) {
             throw new Error(`Expected profile.projects[${index}] to be an object.`);
         }
         const project = entry;
+        assertKnownKeys(project, ['name', 'description', 'repo', 'highlights', 'status'], `profile.projects[${index}].`);
         const status = project.status;
         if (status && !['active', 'maintained', 'paused', 'experimental'].includes(String(status))) {
             throw new Error(`Unsupported project status at profile.projects[${index}].status`);
@@ -67,6 +75,7 @@ function parseLinkCollection(value, label) {
             throw new Error(`Expected ${label}[${index}] to be an object.`);
         }
         const item = entry;
+        assertKnownKeys(item, ['label', 'url'], `${label}[${index}].`);
         return {
             label: assertString(item.label, `${label}[${index}].label`),
             url: assertString(item.url, `${label}[${index}].url`),
@@ -85,6 +94,7 @@ function parseWritingCollection(value, label) {
             throw new Error(`Expected ${label}[${index}] to be an object.`);
         }
         const item = entry;
+        assertKnownKeys(item, ['title', 'label', 'url'], `${label}[${index}].`);
         return {
             title: assertString(item.title ?? item.label, `${label}[${index}].title`),
             url: assertString(item.url, `${label}[${index}].url`),
@@ -102,6 +112,10 @@ function parseProfile(value) {
         throw new Error('Expected profile to be an object.');
     }
     const profile = value;
+    assertKnownKeys(profile, [
+        'name', 'tagline', 'location', 'pronouns', 'website', 'email', 'focus', 'now',
+        'stack', 'links', 'projects', 'writing', 'notes',
+    ], 'profile.');
     let result = {
         name: assertString(profile.name, 'profile.name'),
         tagline: assertString(profile.tagline, 'profile.tagline'),
@@ -123,14 +137,20 @@ export async function loadConfig(configPath, cwd = process.cwd()) {
     const fullPath = resolve(cwd, configPath);
     const raw = await readFile(fullPath, 'utf8');
     const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('Expected config to be an object.');
+    }
+    const root = parsed;
+    assertKnownKeys(root, ['profile', 'options']);
     const config = {
-        profile: parseProfile(parsed.profile),
+        profile: parseProfile(root.profile),
     };
-    if (parsed.options != null) {
-        if (typeof parsed.options !== 'object' || Array.isArray(parsed.options)) {
+    if (root.options != null) {
+        if (typeof root.options !== 'object' || Array.isArray(root.options)) {
             throw new Error('Expected options to be an object.');
         }
-        const options = parsed.options;
+        const options = root.options;
+        assertKnownKeys(options, ['includeChecklist', 'includeValidationSummary'], 'options.');
         config.options = {
             includeChecklist: optionalBoolean(options.includeChecklist, 'options.includeChecklist', true),
             includeValidationSummary: optionalBoolean(options.includeValidationSummary, 'options.includeValidationSummary', true),
