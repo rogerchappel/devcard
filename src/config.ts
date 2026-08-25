@@ -2,6 +2,14 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type { DevcardConfig, DevcardLink, DevcardProfile, DevcardProject, DevcardWriting } from './types.js';
 
+function assertKnownKeys(value: Record<string, unknown>, allowed: readonly string[], path = ''): void {
+  const allowedKeys = new Set(allowed);
+  const unknownKey = Object.keys(value).find((key) => !allowedKeys.has(key));
+  if (unknownKey) {
+    throw new Error(`Unknown config key: ${path}${unknownKey}.`);
+  }
+}
+
 function assertString(value: unknown, label: string): string {
   if (typeof value !== 'string' || value.trim().length === 0) {
     throw new Error(`Expected ${label} to be a non-empty string.`);
@@ -50,6 +58,7 @@ function parseProjects(value: unknown): DevcardProject[] | undefined {
     }
 
     const project = entry as Record<string, unknown>;
+    assertKnownKeys(project, ['name', 'description', 'repo', 'highlights', 'status'], `profile.projects[${index}].`);
     const status = project.status;
     if (status && !['active', 'maintained', 'paused', 'experimental'].includes(String(status))) {
       throw new Error(`Unsupported project status at profile.projects[${index}].status`);
@@ -77,6 +86,7 @@ function parseLinkCollection(value: unknown, label: string): DevcardLink[] | und
       throw new Error(`Expected ${label}[${index}] to be an object.`);
     }
     const item = entry as Record<string, unknown>;
+    assertKnownKeys(item, ['label', 'url'], `${label}[${index}].`);
     return {
       label: assertString(item.label, `${label}[${index}].label`),
       url: assertString(item.url, `${label}[${index}].url`),
@@ -96,6 +106,7 @@ function parseWritingCollection(value: unknown, label: string): DevcardWriting[]
       throw new Error(`Expected ${label}[${index}] to be an object.`);
     }
     const item = entry as Record<string, unknown>;
+    assertKnownKeys(item, ['title', 'label', 'url'], `${label}[${index}].`);
     return {
       title: assertString(item.title ?? item.label, `${label}[${index}].title`),
       url: assertString(item.url, `${label}[${index}].url`),
@@ -116,6 +127,10 @@ function parseProfile(value: unknown): DevcardProfile {
   }
 
   const profile = value as Record<string, unknown>;
+  assertKnownKeys(profile, [
+    'name', 'tagline', 'location', 'pronouns', 'website', 'email', 'focus', 'now',
+    'stack', 'links', 'projects', 'writing', 'notes',
+  ], 'profile.');
 
   let result: DevcardProfile = {
     name: assertString(profile.name, 'profile.name'),
@@ -140,17 +155,23 @@ function parseProfile(value: unknown): DevcardProfile {
 export async function loadConfig(configPath: string, cwd = process.cwd()): Promise<DevcardConfig> {
   const fullPath = resolve(cwd, configPath);
   const raw = await readFile(fullPath, 'utf8');
-  const parsed = JSON.parse(raw) as Record<string, unknown>;
+  const parsed: unknown = JSON.parse(raw);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('Expected config to be an object.');
+  }
+  const root = parsed as Record<string, unknown>;
+  assertKnownKeys(root, ['profile', 'options']);
 
   const config: DevcardConfig = {
-    profile: parseProfile(parsed.profile),
+    profile: parseProfile(root.profile),
   };
 
-  if (parsed.options != null) {
-    if (typeof parsed.options !== 'object' || Array.isArray(parsed.options)) {
+  if (root.options != null) {
+    if (typeof root.options !== 'object' || Array.isArray(root.options)) {
       throw new Error('Expected options to be an object.');
     }
-    const options = parsed.options as Record<string, unknown>;
+    const options = root.options as Record<string, unknown>;
+    assertKnownKeys(options, ['includeChecklist', 'includeValidationSummary'], 'options.');
     config.options = {
       includeChecklist: optionalBoolean(options.includeChecklist, 'options.includeChecklist', true),
       includeValidationSummary: optionalBoolean(options.includeValidationSummary, 'options.includeValidationSummary', true),
