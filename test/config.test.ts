@@ -26,6 +26,28 @@ async function writeConfig(options: unknown): Promise<{ cwd: string; path: strin
   return { cwd, path };
 }
 
+async function writeRawConfig(config: unknown): Promise<{ cwd: string; path: string }> {
+  const cwd = await mkdtemp(join(tmpdir(), 'devcard-config-test-'));
+  const path = 'devcard.json';
+  await writeFile(join(cwd, path), JSON.stringify(config));
+  return { cwd, path };
+}
+
+for (const [label, config] of [
+  ['optoins', { profile: { name: 'Test User', tagline: 'Test profile' }, optoins: {} }],
+  ['profile.foucs', { profile: { name: 'Test User', tagline: 'Test profile', foucs: [] } }],
+  ['profile.projects[0].reop', { profile: { name: 'Test User', tagline: 'Test profile', projects: [{ name: 'Project', description: 'Description', reop: 'https://example.com' }] } }],
+  ['profile.links[0].lable', { profile: { name: 'Test User', tagline: 'Test profile', links: [{ label: 'Site', url: 'https://example.com', lable: 'Site' }] } }],
+  ['profile.writing[0].titel', { profile: { name: 'Test User', tagline: 'Test profile', writing: [{ title: 'Post', url: 'https://example.com', titel: 'Post' }] } }],
+  ['options.includeCheckilst', { profile: { name: 'Test User', tagline: 'Test profile' }, options: { includeCheckilst: false } }],
+] as const) {
+  test(`loadConfig rejects unknown key ${label}`, async () => {
+    const fixture = await writeRawConfig(config);
+    const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    await assert.rejects(loadConfig(fixture.path, fixture.cwd), new RegExp(`Unknown config key: ${escapedLabel}\\.`));
+  });
+}
+
 test('loadConfig preserves explicitly false output options', async () => {
   const fixture = await writeConfig({ includeChecklist: false, includeValidationSummary: false });
   const config = await loadConfig(fixture.path, fixture.cwd);
