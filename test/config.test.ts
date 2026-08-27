@@ -16,6 +16,35 @@ test('loadConfig parses fixture config', async () => {
   assert.equal(config.profile.links?.length, 2);
 });
 
+for (const status of ['active', 'maintained', 'paused', 'experimental'] as const) {
+  test(`loadConfig accepts project status ${status}`, async () => {
+    const fixture = await writeRawConfig({
+      profile: { name: 'Test User', tagline: 'Test profile', projects: [{ name: 'Project', description: 'Description', status }] },
+    });
+    const config = await loadConfig(fixture.path, fixture.cwd);
+    assert.equal(config.profile.projects?.[0]?.status, status);
+  });
+}
+
+for (const [label, status] of [
+  ['null', null],
+  ['empty string', ''],
+  ['false', false],
+  ['zero', 0],
+  ['object', {}],
+  ['unsupported string', 'retired'],
+] as const) {
+  test(`loadConfig rejects project status ${label}`, async () => {
+    const fixture = await writeRawConfig({
+      profile: { name: 'Test User', tagline: 'Test profile', projects: [{ name: 'Project', description: 'Description', status }] },
+    });
+    await assert.rejects(
+      loadConfig(fixture.path, fixture.cwd),
+      /Unsupported project status at profile\.projects\[0\]\.status/,
+    );
+  });
+}
+
 async function writeConfig(options: unknown): Promise<{ cwd: string; path: string }> {
   const cwd = await mkdtemp(join(tmpdir(), 'devcard-config-test-'));
   const path = 'devcard.json';
