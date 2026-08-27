@@ -81,6 +81,8 @@ writing, or options keys cause generation to stop before the output file is
 written, and the error identifies the full path (for example,
 `profile.projects[0].reop`). This prevents misspelled settings from being
 silently ignored; use the example files as the supported-key reference.
+Project `status` may be omitted or set to `active`, `maintained`, `paused`, or
+`experimental`; null, empty, non-string, and other values are rejected.
 
 For a fixture-backed walkthrough that generates a disposable profile README,
 see [docs/tutorials/profile-readme-refresh.md](docs/tutorials/profile-readme-refresh.md)
