@@ -41,3 +41,20 @@ test('generateFromConfig rejects unknown keys before writing output', async () =
   );
   await assert.rejects(access(join(cwd, 'README.md')));
 });
+
+test('generateFromConfig rejects an invalid project status before writing output', async () => {
+  const cwd = await mkdtemp(join(tmpdir(), 'devcard-generate-test-'));
+  await writeFile(join(cwd, 'devcard.json'), JSON.stringify({
+    profile: {
+      name: 'Test User',
+      tagline: 'Test profile',
+      projects: [{ name: 'Project', description: 'Description', status: null }],
+    },
+  }));
+
+  await assert.rejects(
+    generateFromConfig('./devcard.json', './README.md', { cwd }),
+    /Unsupported project status at profile\.projects\[0\]\.status/,
+  );
+  await assert.rejects(access(join(cwd, 'README.md')));
+});
