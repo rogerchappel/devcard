@@ -60,7 +60,7 @@ function parseProjects(value: unknown): DevcardProject[] | undefined {
     const project = entry as Record<string, unknown>;
     assertKnownKeys(project, ['name', 'description', 'repo', 'highlights', 'status'], `profile.projects[${index}].`);
     const status = project.status;
-    if (status && !['active', 'maintained', 'paused', 'experimental'].includes(String(status))) {
+    if (status !== undefined && (typeof status !== 'string' || !['active', 'maintained', 'paused', 'experimental'].includes(status))) {
       throw new Error(`Unsupported project status at profile.projects[${index}].status`);
     }
 
