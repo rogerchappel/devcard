@@ -20,6 +20,23 @@ function configWith(overrides: Record<string, unknown>) {
   return { profile: { name: 'Example', tagline: 'A sufficiently descriptive tagline', location: 'Brisbane', website: 'https://example.com', ...overrides } };
 }
 
+test('validateConfig none mode suppresses every finding while safe mode retains warnings', async () => {
+  const config = configWith({
+    location: undefined,
+    website: undefined,
+    email: 'invalid',
+    links: [{ label: 'Missing', url: './does-not-exist' }],
+  });
+
+  const none = await validateConfig(config, repoRoot, 'none');
+  const safe = await validateConfig(config, repoRoot, 'safe');
+
+  assert.deepEqual(none, { mode: 'none', findings: [] });
+  assert.equal(safe.findings.some((finding) => finding.message.includes('website is optional')), true);
+  assert.equal(safe.findings.some((finding) => finding.message.includes('location is optional')), true);
+  assert.equal(safe.findings.some((finding) => finding.level === 'error'), true);
+});
+
 test('validateConfig rejects malformed and unsupported web targets as links', async () => {
   const report = await validateConfig(configWith({
     website: 'https:// ',

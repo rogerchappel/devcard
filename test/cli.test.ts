@@ -81,3 +81,20 @@ test('runCli reports a missing link relative to the nested config directory', as
   assert.equal(await runCli(['generate', '--config', './config/devcard.json', '--output', './README.md'], cwd, capture.io), 2);
   assert.match(capture.output().stdout, /Validation findings: 1/);
 });
+
+test('runCli none mode emits no validation warnings for a minimal profile', async (t) => {
+  const cwd = await mkdtemp(join(tmpdir(), 'devcard-cli-none-'));
+  t.after(async () => { await import('node:fs/promises').then(({ rm }) => rm(cwd, { recursive: true, force: true })); });
+  await writeFile(join(cwd, 'devcard.json'), JSON.stringify({
+    profile: { name: 'Example', tagline: 'A sufficiently descriptive tagline' },
+  }));
+
+  const capture = captureIo();
+  assert.equal(await runCli(['generate', '--config', './devcard.json', '--output', './README.md', '--validate', 'none'], cwd, capture.io), 0);
+  assert.match(capture.output().stdout, /Validation findings: 0/);
+
+  const markdown = await readFile(join(cwd, 'README.md'), 'utf8');
+  assert.match(markdown, /## Validation\n\n- No findings in the selected validation mode\./);
+  assert.match(markdown, /- \[x\] Check validation warnings/);
+  assert.doesNotMatch(markdown, /Profile (?:website|location) is optional/);
+});
