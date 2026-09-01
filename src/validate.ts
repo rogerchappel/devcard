@@ -53,14 +53,14 @@ async function validateLocalTarget(target: string, baseDir: string, findings: Va
 
 export async function validateConfig(config: DevcardConfig, baseDir: string, mode: 'none' | 'safe'): Promise<ValidationReport> {
   const findings: ValidationFinding[] = [];
-  const { profile } = config;
-
-  pushIfMissing(findings, profile.website, 'Profile website is optional, but recommended for a public card.');
-  pushIfMissing(findings, profile.location, 'Profile location is optional, but helps readers place your context.');
 
   if (mode === 'none') {
     return { mode, findings };
   }
+
+  const { profile } = config;
+  pushIfMissing(findings, profile.website, 'Profile website is optional, but recommended for a public card.');
+  pushIfMissing(findings, profile.location, 'Profile location is optional, but helps readers place your context.');
 
   if (profile.website) validateWebTarget(profile.website, 'website', findings);
   if (profile.email) validateEmail(profile.email, findings);
