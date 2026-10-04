@@ -63,6 +63,16 @@ test('validateConfig validates email addresses with or without mailto', async ()
   }
 });
 
+test('validateConfig rejects local links that resolve outside baseDir', async () => {
+  const report = await validateConfig(configWith({
+    links: [{ label: 'Outside', url: '../../outside.txt' }],
+  }), join(repoRoot, 'fixtures/basic'), 'safe');
+
+  assert.equal(report.findings.length, 1);
+  assert.equal(report.findings[0]!.level, 'error');
+  assert.match(report.findings[0]!.message, /outside the base directory/);
+});
+
 test('validateConfig retains HTTPS, HTTP warnings, and local link paths', async () => {
   const report = await validateConfig(configWith({
     website: 'https://example.com',
