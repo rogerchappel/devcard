@@ -1,5 +1,5 @@
 import { access, stat } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 import type { DevcardConfig, ValidationFinding, ValidationReport } from './types.js';
 
 type TargetField = 'website' | 'link' | 'writing' | 'project repository';
@@ -40,6 +40,11 @@ function validateEmail(email: string, findings: ValidationFinding[]): void {
 
 async function validateLocalTarget(target: string, baseDir: string, findings: ValidationFinding[]): Promise<void> {
   const resolved = resolve(baseDir, target);
+  const relativeTarget = relative(resolve(baseDir), resolved);
+  if (relativeTarget === '..' || relativeTarget.startsWith(`..${sep}`) || isAbsolute(relativeTarget)) {
+    findings.push({ level: 'error', kind: 'image', message: 'Local asset path resolves outside the base directory.', target });
+    return;
+  }
   try {
     await access(resolved);
     const stats = await stat(resolved);
