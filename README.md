@@ -20,8 +20,8 @@ Profile READMEs rot fast. They start sincere, then quietly become a museum of la
 
 ## Install
 
-`devcard` is not yet available from the npm registry. Until `v0.1.1` is
-published, install and run it from a source checkout:
+`devcard` is not yet available from the npm registry (the `devcard@0.1.1`
+lookup currently returns `E404`). Install and run it from a source checkout:
 
 ```sh
 npm ci
@@ -29,7 +29,7 @@ npm run build
 node bin/devcard.js generate --config fixtures/basic/devcard.json --output ./README.generated.md
 ```
 
-After `v0.1.1` is published, install the CLI with
+After a version is published to npm and verified with `npm view`, install the CLI with
 `npm install --global devcard`, or add `devcard` as a project dependency when
 using the library API.
 
